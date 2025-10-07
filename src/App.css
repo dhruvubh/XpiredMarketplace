@@ -1,0 +1,137 @@
+.App {
+  text-align: center;
+}
+
+.hero-section {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
+  padding: 4rem 0;
+  margin-bottom: 2rem;
+}
+
+.hero-title {
+  font-size: 3rem;
+  font-weight: bold;
+  margin-bottom: 1rem;
+}
+
+.hero-subtitle {
+  font-size: 1.2rem;
+  opacity: 0.9;
+}
+
+.stats-card {
+  background: white;
+  border-radius: 10px;
+  padding: 2rem;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  margin-bottom: 2rem;
+}
+
+.stat-number {
+  font-size: 2.5rem;
+  font-weight: bold;
+  color: #28a745;
+}
+
+.stat-label {
+  color: #6c757d;
+  font-size: 1.1rem;
+}
+
+.offer-card {
+  border: 1px solid #dee2e6;
+  border-radius: 8px;
+  padding: 1.5rem;
+  margin-bottom: 1rem;
+  transition: transform 0.2s;
+}
+
+.offer-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+.discount-badge {
+  background: #dc3545;
+  color: white;
+  padding: 0.25rem 0.5rem;
+  border-radius: 4px;
+  font-size: 0.9rem;
+  font-weight: bold;
+}
+
+.expiry-warning {
+  color: #dc3545;
+  font-weight: bold;
+}
+
+.pickup-code {
+  font-family: 'Courier New', monospace;
+  font-size: 1.5rem;
+  font-weight: bold;
+  color: #007bff;
+  background: #f8f9fa;
+  padding: 0.5rem;
+  border-radius: 4px;
+  display: inline-block;
+}
+
+.impact-metric {
+  text-align: center;
+  padding: 1rem;
+}
+
+.impact-number {
+  font-size: 2rem;
+  font-weight: bold;
+  color: #28a745;
+}
+
+.impact-label {
+  color: #6c757d;
+  font-size: 0.9rem;
+}
+
+.btn-rescue {
+  background: #28a745;
+  border-color: #28a745;
+  color: white;
+  font-weight: bold;
+}
+
+.btn-rescue:hover {
+  background: #218838;
+  border-color: #1e7e34;
+}
+
+.navbar-brand {
+  font-weight: bold;
+  font-size: 1.5rem;
+}
+
+.role-badge {
+  font-size: 0.8rem;
+  padding: 0.25rem 0.5rem;
+  border-radius: 12px;
+}
+
+.badge-admin {
+  background: #dc3545;
+  color: white;
+}
+
+.badge-nonprofit {
+  background: #007bff;
+  color: white;
+}
+
+.badge-customer {
+  background: #28a745;
+  color: white;
+}
+
+.badge-store {
+  background: #ffc107;
+  color: #212529;
+}
