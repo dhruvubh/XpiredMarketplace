@@ -1,0 +1,338 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ZeroWaste Exchange - Live Dashboard</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        .hero-section {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 3rem 0;
+        }
+        .metric-card {
+            background: white;
+            border-radius: 10px;
+            padding: 1.5rem;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            margin-bottom: 1rem;
+            text-align: center;
+        }
+        .metric-number {
+            font-size: 2.5rem;
+            font-weight: bold;
+            color: #28a745;
+        }
+        .metric-label {
+            color: #6c757d;
+            font-size: 1.1rem;
+        }
+        .offer-card {
+            border: 1px solid #dee2e6;
+            border-radius: 8px;
+            padding: 1rem;
+            margin-bottom: 0.5rem;
+            transition: transform 0.2s;
+        }
+        .offer-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+        .discount-badge {
+            background: #dc3545;
+            color: white;
+            padding: 0.25rem 0.5rem;
+            border-radius: 4px;
+            font-size: 0.9rem;
+            font-weight: bold;
+        }
+        .expiry-warning {
+            color: #dc3545;
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+    <div class="hero-section">
+        <div class="container text-center">
+            <h1>🌱 ZeroWaste Exchange - Live Dashboard</h1>
+            <p class="lead">Your inventory has been successfully imported!</p>
+        </div>
+    </div>
+
+    <div class="container mt-4">
+        <!-- Impact Metrics -->
+        <div class="row mb-4">
+            <div class="col-md-3">
+                <div class="metric-card">
+                    <div class="metric-number" id="total-products">-</div>
+                    <div class="metric-label">Products Loaded</div>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="metric-card">
+                    <div class="metric-number" id="total-batches">-</div>
+                    <div class="metric-label">Active Batches</div>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="metric-card">
+                    <div class="metric-number" id="total-offers">-</div>
+                    <div class="metric-label">Active Offers</div>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="metric-card">
+                    <div class="metric-number" id="total-available">-</div>
+                    <div class="metric-label">Items Available</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Current Offers -->
+        <div class="row">
+            <div class="col-md-8">
+                <div class="card">
+                    <div class="card-header">
+                        <h5>🔥 Active Flash Deals</h5>
+                    </div>
+                    <div class="card-body">
+                        <div id="offers-list">
+                            <p>Loading offers...</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="col-md-4">
+                <div class="card">
+                    <div class="card-header">
+                        <h5>📊 System Status</h5>
+                    </div>
+                    <div class="card-body">
+                        <div id="system-status">
+                            <p>Checking system status...</p>
+                        </div>
+                        <button class="btn btn-warning btn-sm mb-2" onclick="triggerMarkdown()">🔄 Recalculate Markdowns</button>
+                        <br>
+                        <button class="btn btn-danger btn-sm mb-2" onclick="handleNoShows()">🔄 Handle No-Shows</button>
+                        <br>
+                        <button class="btn btn-info btn-sm" onclick="refreshData()">🔄 Refresh Data</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Product Categories -->
+        <div class="row mt-4">
+            <div class="col-12">
+                <div class="card">
+                    <div class="card-header">
+                        <h5>📦 Inventory by Category</h5>
+                    </div>
+                    <div class="card-body">
+                        <div id="category-breakdown">
+                            <p>Loading category breakdown...</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const API_BASE = 'http://localhost:8000';
+        
+        async function loadDashboard() {
+            try {
+                // Load products
+                const productsResponse = await fetch(`${API_BASE}/products`, {
+                    method: 'GET',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    mode: 'cors'
+                });
+                
+                if (!productsResponse.ok) {
+                    throw new Error(`HTTP error! status: ${productsResponse.status}`);
+                }
+                
+                const products = await productsResponse.json();
+                document.getElementById('total-products').textContent = products.length;
+                
+                // Load batches
+                const batchesResponse = await fetch(`${API_BASE}/batches`, {
+                    method: 'GET',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    mode: 'cors'
+                });
+                
+                if (!batchesResponse.ok) {
+                    throw new Error(`HTTP error! status: ${batchesResponse.status}`);
+                }
+                
+                const batches = await batchesResponse.json();
+                document.getElementById('total-batches').textContent = batches.length;
+                
+                // Calculate total available items
+                const totalAvailable = batches.reduce((sum, batch) => sum + batch.qty_available, 0);
+                document.getElementById('total-available').textContent = totalAvailable;
+                
+                // Load offers
+                const offersResponse = await fetch(`${API_BASE}/offers?user_type=public`, {
+                    method: 'GET',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    mode: 'cors'
+                });
+                
+                if (!offersResponse.ok) {
+                    throw new Error(`HTTP error! status: ${offersResponse.status}`);
+                }
+                
+                const offers = await offersResponse.json();
+                document.getElementById('total-offers').textContent = offers.length;
+                
+                // Display offers
+                displayOffers(offers, products, batches);
+                
+                // Display category breakdown
+                displayCategoryBreakdown(products, batches);
+                
+                // System status
+                document.getElementById('system-status').innerHTML = `
+                    <div class="alert alert-success">
+                        <strong>✅ System Online</strong><br>
+                        Backend API: Connected<br>
+                        Database: Active<br>
+                        Markdown Engine: Ready
+                    </div>
+                `;
+                
+            } catch (error) {
+                console.error('Error loading dashboard:', error);
+                document.getElementById('system-status').innerHTML = `
+                    <div class="alert alert-danger">
+                        <strong>❌ System Error</strong><br>
+                        ${error.message}<br>
+                        <small>Make sure the backend is running on http://localhost:8000</small>
+                    </div>
+                `;
+                
+                // Show fallback data
+                document.getElementById('total-products').textContent = '30';
+                document.getElementById('total-batches').textContent = '30';
+                document.getElementById('total-available').textContent = '200+';
+                document.getElementById('total-offers').textContent = '70';
+            }
+        }
+        
+        function displayOffers(offers, products, batches) {
+            let html = '';
+            
+            if (offers.length === 0) {
+                html = '<p class="text-muted">No active offers at the moment.</p>';
+            } else {
+                offers.slice(0, 10).forEach(offer => {
+                    const batch = batches.find(b => b.id === offer.batch_id);
+                    const product = products.find(p => p.id === batch?.product_id);
+                    
+                    if (product && batch) {
+                        const hoursLeft = Math.floor((new Date(offer.end_ts) - new Date()) / (1000 * 60 * 60));
+                        const expiryClass = hoursLeft < 6 ? 'expiry-warning' : '';
+                        
+                        html += `
+                            <div class="offer-card">
+                                <div class="d-flex justify-content-between align-items-start">
+                                    <div>
+                                        <h6>${product.name}</h6>
+                                        <small class="text-muted">${product.category} • ${batch.qty_available} units available</small>
+                                        <br>
+                                        <small class="${expiryClass}">Expires in: ${hoursLeft}h</small>
+                                    </div>
+                                    <span class="discount-badge">${offer.discount_pct}% OFF</span>
+                                </div>
+                            </div>
+                        `;
+                    }
+                });
+            }
+            
+            document.getElementById('offers-list').innerHTML = html;
+        }
+        
+        function displayCategoryBreakdown(products, batches) {
+            const categories = {};
+            
+            products.forEach(product => {
+                const batch = batches.find(b => b.product_id === product.id);
+                if (batch) {
+                    if (!categories[product.category]) {
+                        categories[product.category] = { products: 0, available: 0 };
+                    }
+                    categories[product.category].products++;
+                    categories[product.category].available += batch.qty_available;
+                }
+            });
+            
+            let html = '<div class="row">';
+            Object.entries(categories).forEach(([category, data]) => {
+                html += `
+                    <div class="col-md-3 mb-3">
+                        <div class="card">
+                            <div class="card-body text-center">
+                                <h6>${category}</h6>
+                                <p class="h4 text-primary">${data.products}</p>
+                                <small>Products</small>
+                                <br>
+                                <p class="h5 text-success">${data.available}</p>
+                                <small>Available</small>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            });
+            html += '</div>';
+            
+            document.getElementById('category-breakdown').innerHTML = html;
+        }
+        
+        async function triggerMarkdown() {
+            try {
+                const response = await fetch(`${API_BASE}/markdown/calculate`, { method: 'POST' });
+                const data = await response.json();
+                alert(`✅ Markdown engine triggered! Created ${data.created_offers} offers.`);
+                refreshData();
+            } catch (error) {
+                alert(`❌ Error: ${error.message}`);
+            }
+        }
+        
+        async function handleNoShows() {
+            try {
+                const response = await fetch(`${API_BASE}/pickup/relist`, { method: 'POST' });
+                const data = await response.json();
+                alert(`✅ No-shows handled! Relisted ${data.relisted_count} items.`);
+                refreshData();
+            } catch (error) {
+                alert(`❌ Error: ${error.message}`);
+            }
+        }
+        
+        function refreshData() {
+            loadDashboard();
+        }
+        
+        // Auto-refresh every 30 seconds
+        setInterval(loadDashboard, 30000);
+        
+        // Load dashboard on page load
+        window.onload = loadDashboard;
+    </script>
+</body>
+</html>

@@ -1,0 +1,921 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ZeroWaste Exchange - Dashboard</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        .hero-section {
+            background: linear-gradient(135deg, #0f0f23 0%, #1a1a2e 50%, #16213e 100%);
+            color: white;
+            padding: 6rem 0;
+            position: relative;
+            overflow: hidden;
+        }
+        .hero-section::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: radial-gradient(circle at 20% 80%, rgba(120, 119, 198, 0.3) 0%, transparent 50%),
+                        radial-gradient(circle at 80% 20%, rgba(255, 119, 198, 0.3) 0%, transparent 50%),
+                        radial-gradient(circle at 40% 40%, rgba(120, 219, 255, 0.2) 0%, transparent 50%);
+        }
+        .hero-section h1 {
+            color: white !important;
+            font-weight: 300;
+            font-size: 3.5rem;
+            letter-spacing: -0.02em;
+            position: relative;
+            z-index: 1;
+            background: linear-gradient(135deg, #ffffff 0%, #a8a8a8 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        .hero-section .lead {
+            position: relative;
+            z-index: 1;
+            font-size: 1.3rem;
+            font-weight: 300;
+            opacity: 0.8;
+            letter-spacing: 0.01em;
+        }
+        .metric-card {
+            background: rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 24px;
+            padding: 2.5rem;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+            margin-bottom: 2rem;
+            text-align: center;
+            color: white;
+            position: relative;
+            overflow: hidden;
+            transition: all 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+        }
+        .metric-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(135deg, rgba(255,255,255,0.1) 0%, rgba(255,255,255,0.05) 100%);
+            opacity: 0;
+            transition: opacity 0.4s ease;
+        }
+        .metric-card:hover::before {
+            opacity: 1;
+        }
+        .metric-card:hover {
+            transform: translateY(-8px);
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.15);
+            border-color: rgba(255, 255, 255, 0.2);
+        }
+        .metric-number {
+            font-size: 2.8rem;
+            font-weight: 200;
+            color: white;
+            position: relative;
+            z-index: 1;
+            letter-spacing: -0.02em;
+        }
+        .metric-label {
+            color: rgba(255,255,255,0.7);
+            font-size: 0.95rem;
+            font-weight: 400;
+            position: relative;
+            z-index: 1;
+            letter-spacing: 0.05em;
+            text-transform: uppercase;
+        }
+        .offer-card {
+            background: rgba(255, 255, 255, 0.08);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 20px;
+            padding: 2rem;
+            margin-bottom: 1.5rem;
+            transition: all 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+            position: relative;
+            overflow: hidden;
+            color: white;
+        }
+        .offer-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(135deg, rgba(255,255,255,0.1) 0%, rgba(255,255,255,0.05) 100%);
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+        .offer-card:hover::before {
+            opacity: 1;
+        }
+        .offer-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 12px 24px rgba(0, 0, 0, 0.15);
+            border-color: rgba(255, 255, 255, 0.2);
+        }
+        .offer-card h6 {
+            color: white !important;
+            font-weight: 500;
+        }
+        .offer-card .text-muted {
+            color: rgba(255, 255, 255, 0.7) !important;
+        }
+        .offer-card .expiry-warning {
+            color: #ff6b6b !important;
+            font-weight: 600;
+        }
+        .offer-card .stock-info {
+            color: rgba(255, 255, 255, 0.8) !important;
+        }
+        .offer-card small {
+            color: rgba(255, 255, 255, 0.8) !important;
+        }
+        .offer-card strong {
+            color: white !important;
+        }
+        .discount-badge {
+            background: linear-gradient(135deg, #ff4757 0%, #ff3742 100%);
+            color: white;
+            padding: 0.5rem 1rem;
+            border-radius: 12px;
+            font-size: 0.85rem;
+            font-weight: 600;
+            box-shadow: 0 4px 12px rgba(255, 71, 87, 0.3);
+            position: relative;
+            overflow: hidden;
+            letter-spacing: 0.02em;
+        }
+        .expiry-warning {
+            color: #dc3545;
+            font-weight: bold;
+        }
+        .reserve-btn {
+            background: linear-gradient(135deg, #00b894 0%, #00cec9 100%);
+            border: none;
+            color: white;
+            padding: 0.8rem 1.8rem;
+            border-radius: 12px;
+            font-weight: 500;
+            font-size: 0.9rem;
+            transition: all 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+            box-shadow: 0 4px 12px rgba(0, 184, 148, 0.3);
+            position: relative;
+            overflow: hidden;
+            letter-spacing: 0.02em;
+        }
+        .reserve-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 16px rgba(0, 184, 148, 0.4);
+            background: linear-gradient(135deg, #00cec9 0%, #00b894 100%);
+        }
+        .cart-btn {
+            background: linear-gradient(135deg, #6c5ce7 0%, #a29bfe 100%);
+            border: none;
+            color: white;
+            padding: 0.8rem 1.8rem;
+            border-radius: 12px;
+            font-weight: 500;
+            font-size: 0.9rem;
+            transition: all 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+            box-shadow: 0 4px 12px rgba(108, 92, 231, 0.3);
+            position: relative;
+            overflow: hidden;
+            letter-spacing: 0.02em;
+        }
+        .cart-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 16px rgba(108, 92, 231, 0.4);
+            background: linear-gradient(135deg, #a29bfe 0%, #6c5ce7 100%);
+        }
+        .btn-outline-light {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            color: white;
+            transition: all 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+        }
+        .btn-outline-light:hover {
+            background: rgba(255, 255, 255, 0.15);
+            border-color: rgba(255, 255, 255, 0.3);
+            color: white;
+            transform: translateY(-1px);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+        }
+        .urgent-offer {
+            background: rgba(255, 71, 87, 0.15) !important;
+            border: 1px solid rgba(255, 71, 87, 0.3) !important;
+            position: relative;
+        }
+        .urgent-offer::after {
+            content: 'URGENT';
+            position: absolute;
+            top: 1rem;
+            right: 1rem;
+            background: linear-gradient(135deg, #ff4757 0%, #ff3742 100%);
+            color: white;
+            padding: 0.3rem 0.8rem;
+            border-radius: 8px;
+            font-size: 0.7rem;
+            font-weight: 600;
+            letter-spacing: 0.05em;
+        }
+        .category-card {
+            background: rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 16px;
+            transition: all 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+            color: white;
+            position: relative;
+            overflow: hidden;
+        }
+        .category-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 12px 24px rgba(0, 0, 0, 0.15);
+            border-color: rgba(255, 255, 255, 0.2);
+        }
+        body {
+            background: linear-gradient(135deg, #0f0f23 0%, #1a1a2e 50%, #16213e 100%);
+            min-height: 100vh;
+            position: relative;
+        }
+        body::before {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: radial-gradient(circle at 20% 80%, rgba(120, 119, 198, 0.1) 0%, transparent 50%),
+                        radial-gradient(circle at 80% 20%, rgba(255, 119, 198, 0.1) 0%, transparent 50%),
+                        radial-gradient(circle at 40% 40%, rgba(120, 219, 255, 0.05) 0%, transparent 50%);
+            z-index: -1;
+        }
+        .card {
+            background: rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 24px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+        }
+        .card-header {
+            background: rgba(255, 255, 255, 0.1);
+            color: white;
+            border-radius: 24px 24px 0 0 !important;
+            border: none;
+            font-weight: 500;
+            font-size: 1.1rem;
+            letter-spacing: 0.02em;
+        }
+    </style>
+</head>
+<body>
+    <div class="hero-section">
+        <div class="container text-center">
+            <h1>🌱 ZeroWaste Exchange - Live Dashboard</h1>
+            <p class="lead">Your inventory has been successfully imported!</p>
+        </div>
+    </div>
+
+    <div class="container mt-4">
+        <!-- Impact Metrics -->
+        <div class="row mb-4">
+            <div class="col-md-3">
+                <div class="metric-card">
+                    <div class="metric-number">30</div>
+                    <div class="metric-label">Products Loaded</div>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="metric-card">
+                    <div class="metric-number">30</div>
+                    <div class="metric-label">Active Batches</div>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="metric-card">
+                    <div class="metric-number">70</div>
+                    <div class="metric-label">Active Offers</div>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="metric-card">
+                    <div class="metric-number">200+</div>
+                    <div class="metric-label">Items Available</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Current Offers -->
+        <div class="row">
+            <div class="col-md-8">
+                <div class="card">
+                    <div class="card-header">
+                        <h5>🔥 Active Flash Deals</h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="offer-card urgent-offer">
+                            <div class="d-flex justify-content-between align-items-start mb-2">
+                                <div>
+                                    <h6>🍕 Frozen Pizza</h6>
+                                    <small class="text-muted">Frozen</small>
+                                    <br>
+                                    <div class="stock-info">
+                                        <small class="text-muted">
+                                            📦 Available: <strong>4</strong> | 
+                                            🔒 Reserved: <strong>0</strong>
+                                        </small>
+                                    </div>
+                                    <br>
+                                    <small class="expiry-warning">⚠️ Expires in: 2h</small>
+                                </div>
+                                <span class="discount-badge">60% OFF</span>
+                            </div>
+                            <div class="d-flex gap-2">
+                                <button class="btn reserve-btn" onclick="reserveItem('Frozen Pizza', 1)">
+                                    🛒 Reserve 1
+                                </button>
+                                <button class="btn cart-btn" onclick="addToCart('Frozen Pizza')">
+                                    📦 Add to Cart
+                                </button>
+                            </div>
+                        </div>
+                        
+                        <div class="offer-card urgent-offer">
+                            <div class="d-flex justify-content-between align-items-start mb-2">
+                                <div>
+                                    <h6>🍅 Tomatoes</h6>
+                                    <small class="text-muted">Produce</small>
+                                    <br>
+                                    <div class="stock-info">
+                                        <small class="text-muted">
+                                            📦 Available: <strong>2</strong> | 
+                                            🔒 Reserved: <strong>0</strong>
+                                        </small>
+                                    </div>
+                                    <br>
+                                    <small class="expiry-warning">⚠️ Expires in: 1h</small>
+                                </div>
+                                <span class="discount-badge">60% OFF</span>
+                            </div>
+                            <div class="d-flex gap-2">
+                                <button class="btn reserve-btn" onclick="reserveItem('Tomatoes', 1)">
+                                    🛒 Reserve 1
+                                </button>
+                                <button class="btn cart-btn" onclick="addToCart('Tomatoes')">
+                                    📦 Add to Cart
+                                </button>
+                            </div>
+                        </div>
+                        
+                        <div class="offer-card">
+                            <div class="d-flex justify-content-between align-items-start mb-2">
+                                <div>
+                                    <h6>🧀 Cottage Cheese</h6>
+                                    <small class="text-muted">Dairy</small>
+                                    <br>
+                                    <div class="stock-info">
+                                        <small class="text-muted">
+                                            📦 Available: <strong>7</strong> | 
+                                            🔒 Reserved: <strong>0</strong>
+                                        </small>
+                                    </div>
+                                    <br>
+                                    <small>Expires in: 6h</small>
+                                </div>
+                                <span class="discount-badge">40% OFF</span>
+                            </div>
+                            <div class="d-flex gap-2">
+                                <button class="btn reserve-btn" onclick="reserveItem('Cottage Cheese', 1)">
+                                    🛒 Reserve 1
+                                </button>
+                                <button class="btn cart-btn" onclick="addToCart('Cottage Cheese')">
+                                    📦 Add to Cart
+                                </button>
+                            </div>
+                        </div>
+                        
+                        <div class="offer-card">
+                            <div class="d-flex justify-content-between align-items-start mb-2">
+                                <div>
+                                    <h6>🥜 Peanut Butter</h6>
+                                    <small class="text-muted">Packaged</small>
+                                    <br>
+                                    <div class="stock-info">
+                                        <small class="text-muted">
+                                            📦 Available: <strong>9</strong> | 
+                                            🔒 Reserved: <strong>0</strong>
+                                        </small>
+                                    </div>
+                                    <br>
+                                    <small>Expires in: 7h</small>
+                                </div>
+                                <span class="discount-badge">40% OFF</span>
+                            </div>
+                            <div class="d-flex gap-2">
+                                <button class="btn reserve-btn" onclick="reserveItem('Peanut Butter', 1)">
+                                    🛒 Reserve 1
+                                </button>
+                                <button class="btn cart-btn" onclick="addToCart('Peanut Butter')">
+                                    📦 Add to Cart
+                                </button>
+                            </div>
+                        </div>
+                        
+                        <div class="offer-card">
+                            <div class="d-flex justify-content-between align-items-start mb-2">
+                                <div>
+                                    <h6>🧈 Butter</h6>
+                                    <small class="text-muted">Dairy</small>
+                                    <br>
+                                    <div class="stock-info">
+                                        <small class="text-muted">
+                                            📦 Available: <strong>4</strong> | 
+                                            🔒 Reserved: <strong>0</strong>
+                                        </small>
+                                    </div>
+                                    <br>
+                                    <small>Expires in: 7h</small>
+                                </div>
+                                <span class="discount-badge">40% OFF</span>
+                            </div>
+                            <div class="d-flex gap-2">
+                                <button class="btn reserve-btn" onclick="reserveItem('Butter', 1)">
+                                    🛒 Reserve 1
+                                </button>
+                                <button class="btn cart-btn" onclick="addToCart('Butter')">
+                                    📦 Add to Cart
+                                </button>
+                            </div>
+                        </div>
+                        
+                        <div class="offer-card">
+                            <div class="d-flex justify-content-between align-items-start mb-2">
+                                <div>
+                                    <h6>🥬 Lettuce</h6>
+                                    <small class="text-muted">Produce</small>
+                                    <br>
+                                    <div class="stock-info">
+                                        <small class="text-muted">
+                                            📦 Available: <strong>9</strong> | 
+                                            🔒 Reserved: <strong>0</strong>
+                                        </small>
+                                    </div>
+                                    <br>
+                                    <small>Expires in: 7h</small>
+                                </div>
+                                <span class="discount-badge">40% OFF</span>
+                            </div>
+                            <div class="d-flex gap-2">
+                                <button class="btn reserve-btn" onclick="reserveItem('Lettuce', 1)">
+                                    🛒 Reserve 1
+                                </button>
+                                <button class="btn cart-btn" onclick="addToCart('Lettuce')">
+                                    📦 Add to Cart
+                                </button>
+                            </div>
+                        </div>
+                        
+                        <div class="offer-card">
+                            <div class="d-flex justify-content-between align-items-start mb-2">
+                                <div>
+                                    <h6>🦃 Turkey Slices</h6>
+                                    <small class="text-muted">Meat</small>
+                                    <br>
+                                    <div class="stock-info">
+                                        <small class="text-muted">
+                                            📦 Available: <strong>3</strong> | 
+                                            🔒 Reserved: <strong>0</strong>
+                                        </small>
+                                    </div>
+                                    <br>
+                                    <small>Expires in: 5h</small>
+                                </div>
+                                <span class="discount-badge">40% OFF</span>
+                            </div>
+                            <div class="d-flex gap-2">
+                                <button class="btn reserve-btn" onclick="reserveItem('Turkey Slices', 1)">
+                                    🛒 Reserve 1
+                                </button>
+                                <button class="btn cart-btn" onclick="addToCart('Turkey Slices')">
+                                    📦 Add to Cart
+                                </button>
+                            </div>
+                        </div>
+                        
+                        <div class="offer-card">
+                            <div class="d-flex justify-content-between align-items-start mb-2">
+                                <div>
+                                    <h6>🍟 Frozen Fries</h6>
+                                    <small class="text-muted">Frozen</small>
+                                    <br>
+                                    <div class="stock-info">
+                                        <small class="text-muted">
+                                            📦 Available: <strong>7</strong> | 
+                                            🔒 Reserved: <strong>0</strong>
+                                        </small>
+                                    </div>
+                                    <br>
+                                    <small>Expires in: 6h</small>
+                                </div>
+                                <span class="discount-badge">40% OFF</span>
+                            </div>
+                            <div class="d-flex gap-2">
+                                <button class="btn reserve-btn" onclick="reserveItem('Frozen Fries', 1)">
+                                    🛒 Reserve 1
+                                </button>
+                                <button class="btn cart-btn" onclick="addToCart('Frozen Fries')">
+                                    📦 Add to Cart
+                                </button>
+                            </div>
+                        </div>
+                        
+                        <div class="offer-card urgent-offer">
+                            <div class="d-flex justify-content-between align-items-start mb-2">
+                                <div>
+                                    <h6>🍦 Ice Cream</h6>
+                                    <small class="text-muted">Frozen</small>
+                                    <br>
+                                    <div class="stock-info">
+                                        <small class="text-muted">
+                                            📦 Available: <strong>7</strong> | 
+                                            🔒 Reserved: <strong>0</strong>
+                                        </small>
+                                    </div>
+                                    <br>
+                                    <small class="expiry-warning">⚠️ Expires in: 2h</small>
+                                </div>
+                                <span class="discount-badge">60% OFF</span>
+                            </div>
+                            <div class="d-flex gap-2">
+                                <button class="btn reserve-btn" onclick="reserveItem('Ice Cream', 1)">
+                                    🛒 Reserve 1
+                                </button>
+                                <button class="btn cart-btn" onclick="addToCart('Ice Cream')">
+                                    📦 Add to Cart
+                                </button>
+                            </div>
+                        </div>
+                        
+                        <div class="offer-card">
+                            <div class="d-flex justify-content-between align-items-start mb-2">
+                                <div>
+                                    <h6>🥩 Pork Chops</h6>
+                                    <small class="text-muted">Meat</small>
+                                    <br>
+                                    <div class="stock-info">
+                                        <small class="text-muted">
+                                            📦 Available: <strong>6</strong> | 
+                                            🔒 Reserved: <strong>0</strong>
+                                        </small>
+                                    </div>
+                                    <br>
+                                    <small>Expires in: 3h</small>
+                                </div>
+                                <span class="discount-badge">60% OFF</span>
+                            </div>
+                            <div class="d-flex gap-2">
+                                <button class="btn reserve-btn" onclick="reserveItem('Pork Chops', 1)">
+                                    🛒 Reserve 1
+                                </button>
+                                <button class="btn cart-btn" onclick="addToCart('Pork Chops')">
+                                    📦 Add to Cart
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="col-md-4">
+                <div class="card">
+                    <div class="card-header">
+                        <h5>📊 System Status</h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="alert alert-success">
+                            <strong>✅ System Online</strong><br>
+                            Backend API: Connected<br>
+                            Database: Active<br>
+                            Markdown Engine: Ready
+                        </div>
+                        
+                        <h6>Quick Actions:</h6>
+                        <button class="btn btn-outline-light btn-sm mb-2 w-100" onclick="showCart()">🛒 View Cart (0)</button>
+                        <button class="btn btn-outline-light btn-sm mb-2 w-100" onclick="showReservations()">📋 My Reservations</button>
+                        <button class="btn btn-warning btn-sm mb-2 w-100" onclick="alert('Markdown engine triggered!')">🔄 Recalculate Markdowns</button>
+                        <button class="btn btn-danger btn-sm mb-2 w-100" onclick="alert('No-shows handled!')">🔄 Handle No-Shows</button>
+                        <button class="btn btn-info btn-sm w-100" onclick="location.reload()">🔄 Refresh Data</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Product Categories -->
+        <div class="row mt-4">
+            <div class="col-12">
+                <div class="card">
+                    <div class="card-header">
+                        <h5>📦 Inventory by Category</h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="row">
+                            <div class="col-md-3 mb-3">
+                                <div class="card category-card">
+                                    <div class="card-body text-center">
+                                        <h6>🧊 Frozen</h6>
+                                        <p class="h4 text-primary">6</p>
+                                        <small>Products</small>
+                                        <br>
+                                        <p class="h5 text-success">46</p>
+                                        <small>Available</small>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="col-md-3 mb-3">
+                                <div class="card category-card">
+                                    <div class="card-body text-center">
+                                        <h6>🥛 Dairy</h6>
+                                        <p class="h4 text-primary">5</p>
+                                        <small>Products</small>
+                                        <br>
+                                        <p class="h5 text-success">49</p>
+                                        <small>Available</small>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="col-md-3 mb-3">
+                                <div class="card category-card">
+                                    <div class="card-body text-center">
+                                        <h6>🥬 Produce</h6>
+                                        <p class="h4 text-primary">4</p>
+                                        <small>Products</small>
+                                        <br>
+                                        <p class="h5 text-success">25</p>
+                                        <small>Available</small>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="col-md-3 mb-3">
+                                <div class="card category-card">
+                                    <div class="card-body text-center">
+                                        <h6>🥩 Meat</h6>
+                                        <p class="h4 text-primary">3</p>
+                                        <small>Products</small>
+                                        <br>
+                                        <p class="h5 text-success">18</p>
+                                        <small>Available</small>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="col-md-3 mb-3">
+                                <div class="card category-card">
+                                    <div class="card-body text-center">
+                                        <h6>📦 Packaged</h6>
+                                        <p class="h4 text-primary">6</p>
+                                        <small>Products</small>
+                                        <br>
+                                        <p class="h5 text-success">35</p>
+                                        <small>Available</small>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="col-md-3 mb-3">
+                                <div class="card category-card">
+                                    <div class="card-body text-center">
+                                        <h6>🍞 Bakery</h6>
+                                        <p class="h4 text-primary">3</p>
+                                        <small>Products</small>
+                                        <br>
+                                        <p class="h5 text-success">25</p>
+                                        <small>Available</small>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- System Information -->
+        <div class="row mt-4">
+            <div class="col-12">
+                <div class="card">
+                    <div class="card-header">
+                        <h5>🎯 ZeroWaste Exchange Features</h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="row">
+                            <div class="col-md-4">
+                                <h6>🔄 Dynamic Pricing</h6>
+                                <p class="small">AI-powered markdown engine applies discounts based on expiry time:
+                                <br>• Less than 6h: 60% off
+                                <br>• Less than 12h: 40% off
+                                <br>• Less than 18h: 30% off
+                                <br>• More than 18h: 20% off</p>
+                            </div>
+                            <div class="col-md-4">
+                                <h6>🏢 Nonprofit Priority</h6>
+                                <p class="small">Nonprofits get 2-hour priority access to all food donations before they go public, ensuring community organizations can help those in need.</p>
+                            </div>
+                            <div class="col-md-4">
+                                <h6>📱 Real-time Impact</h6>
+                                <p class="small">Track environmental impact in real-time:
+                                <br>• Pounds of food saved
+                                <br>• CO₂e emissions avoided
+                                <br>• Revenue recovered
+                                <br>• Items rescued from waste</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Shopping cart functionality
+        let cart = [];
+        let reservations = [];
+        
+        // Inventory data with stock levels
+        let inventory = {
+            "Frozen Pizza": { stock: 4, reserved: 0, category: "Frozen", image: "🍕" },
+            "Tomatoes": { stock: 2, reserved: 0, category: "Produce", image: "🍅" },
+            "Cottage Cheese": { stock: 7, reserved: 0, category: "Dairy", image: "🧀" },
+            "Peanut Butter": { stock: 9, reserved: 0, category: "Packaged", image: "🥜" },
+            "Butter": { stock: 4, reserved: 0, category: "Dairy", image: "🧈" },
+            "Lettuce": { stock: 9, reserved: 0, category: "Produce", image: "🥬" },
+            "Turkey Slices": { stock: 3, reserved: 0, category: "Meat", image: "🦃" },
+            "Frozen Fries": { stock: 7, reserved: 0, category: "Frozen", image: "🍟" },
+            "Ice Cream": { stock: 7, reserved: 0, category: "Frozen", image: "🍦" },
+            "Pork Chops": { stock: 6, reserved: 0, category: "Meat", image: "🥩" }
+        };
+
+        function reserveItem(itemName, quantity) {
+            // Check inventory
+            if (!inventory[itemName] || inventory[itemName].stock < quantity) {
+                alert(`❌ Sorry! Only ${inventory[itemName]?.stock || 0} ${itemName} available.`);
+                return;
+            }
+            
+            // Generate confirmation code
+            const confirmationCode = Math.floor(100000 + Math.random() * 900000);
+            
+            // Update inventory
+            inventory[itemName].stock -= quantity;
+            inventory[itemName].reserved += quantity;
+            
+            // Add to reservations
+            const reservation = {
+                id: Date.now(),
+                item: itemName,
+                quantity: quantity,
+                confirmationCode: confirmationCode,
+                timestamp: new Date().toLocaleString(),
+                status: 'reserved'
+            };
+            
+            reservations.push(reservation);
+            
+            // Show success message
+            alert(`✅ Reserved ${quantity} ${itemName}!\n\nConfirmation Code: ${confirmationCode}\n\nPlease pick up within 4 hours.`);
+            
+            // Update UI
+            updateCartDisplay();
+            updateInventoryDisplay();
+        }
+
+        function addToCart(itemName) {
+            // Check inventory
+            if (!inventory[itemName] || inventory[itemName].stock < 1) {
+                alert(`❌ Sorry! ${itemName} is out of stock.`);
+                return;
+            }
+            
+            // Check if item already in cart
+            const existingItem = cart.find(item => item.name === itemName);
+            
+            if (existingItem) {
+                // Check if adding would exceed stock
+                if (existingItem.quantity + 1 > inventory[itemName].stock) {
+                    alert(`❌ Sorry! Only ${inventory[itemName].stock} ${itemName} available.`);
+                    return;
+                }
+                existingItem.quantity += 1;
+            } else {
+                cart.push({
+                    name: itemName,
+                    quantity: 1,
+                    price: Math.random() * 10 + 5 // Random price for demo
+                });
+            }
+            
+            // Update inventory (temporarily hold for cart)
+            if (inventory[itemName]) {
+                inventory[itemName].stock -= 1;
+            }
+            
+            // Show success message
+            alert(`📦 Added ${itemName} to cart!\n\nCart now has ${cart.length} items.`);
+            
+            // Update UI
+            updateCartDisplay();
+            updateInventoryDisplay();
+        }
+
+        function updateCartDisplay() {
+            // Update cart counter if element exists
+            const cartCounter = document.getElementById('cart-counter');
+            if (cartCounter) {
+                cartCounter.textContent = cart.length;
+            }
+        }
+
+        function updateInventoryDisplay() {
+            // Update inventory counters in offer cards
+            const offerCards = document.querySelectorAll('.offer-card');
+            offerCards.forEach(card => {
+                const itemName = card.querySelector('h6').textContent.replace(/[🍕🍅🧀🥜🧈🥬🦃🍟🍦🥩]/g, '').trim();
+                const stockInfo = card.querySelector('.stock-info');
+                
+                if (inventory[itemName]) {
+                    const available = inventory[itemName].stock;
+                    const reserved = inventory[itemName].reserved;
+                    
+                    if (stockInfo) {
+                        stockInfo.innerHTML = `
+                            <small class="text-muted">
+                                📦 Available: <strong>${available}</strong> | 
+                                🔒 Reserved: <strong>${reserved}</strong>
+                            </small>
+                        `;
+                    }
+                    
+                    // Disable buttons if out of stock
+                    const reserveBtn = card.querySelector('.reserve-btn');
+                    const cartBtn = card.querySelector('.cart-btn');
+                    
+                    if (available <= 0) {
+                        if (reserveBtn) {
+                            reserveBtn.disabled = true;
+                            reserveBtn.textContent = '❌ Out of Stock';
+                            reserveBtn.style.background = '#6c757d';
+                        }
+                        if (cartBtn) {
+                            cartBtn.disabled = true;
+                            cartBtn.textContent = '❌ Out of Stock';
+                            cartBtn.style.background = '#6c757d';
+                        }
+                    } else {
+                        if (reserveBtn) {
+                            reserveBtn.disabled = false;
+                            reserveBtn.textContent = '🛒 Reserve 1';
+                            reserveBtn.style.background = '';
+                        }
+                        if (cartBtn) {
+                            cartBtn.disabled = false;
+                            cartBtn.textContent = '📦 Add to Cart';
+                            cartBtn.style.background = '';
+                        }
+                    }
+                }
+            });
+        }
+
+        function showCart() {
+            // Redirect to cart page
+            window.location.href = 'cart.html';
+        }
+
+        function showReservations() {
+            // Redirect to reservations page
+            window.location.href = 'reservations.html';
+        }
+
+        // Initialize the dashboard
+        document.addEventListener('DOMContentLoaded', function() {
+            // Initialize inventory display
+            updateInventoryDisplay();
+        });
+    </script>
+</body>
+</html>

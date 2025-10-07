@@ -1,0 +1,337 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ZeroWaste Exchange - My Reservations</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        .hero-section {
+            background: linear-gradient(135deg, #2E8B57 0%, #228B22 50%, #32CD32 100%);
+            color: white;
+            padding: 3rem 0;
+        }
+        .hero-section h1 {
+            color: black !important;
+            font-weight: bold;
+        }
+        .reservation-card {
+            border: 2px solid #e9ecef;
+            border-radius: 12px;
+            padding: 1.5rem;
+            margin-bottom: 1rem;
+            background: linear-gradient(135deg, #ffffff 0%, #f8f9fa 100%);
+            transition: all 0.3s ease;
+        }
+        .reservation-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 12px rgba(46, 139, 87, 0.2);
+            border-color: #2E8B57;
+        }
+        .reservation-card.urgent {
+            border-left: 5px solid #dc3545;
+            background: linear-gradient(135deg, #fff5f5 0%, #ffe6e6 100%);
+        }
+        .reservation-card.completed {
+            border-left: 5px solid #28a745;
+            background: linear-gradient(135deg, #f0fff4 0%, #e6ffe6 100%);
+        }
+        .item-preview {
+            width: 80px;
+            height: 80px;
+            border-radius: 12px;
+            object-fit: cover;
+            border: 2px solid #2E8B57;
+        }
+        .confirmation-code {
+            font-family: 'Courier New', monospace;
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: #007bff;
+            background: #f8f9fa;
+            padding: 0.5rem;
+            border-radius: 8px;
+            border: 2px solid #007bff;
+        }
+        .status-badge {
+            padding: 0.4rem 0.8rem;
+            border-radius: 20px;
+            font-weight: bold;
+        }
+        .status-reserved {
+            background: linear-gradient(135deg, #ffc107 0%, #ff8c00 100%);
+            color: white;
+        }
+        .status-completed {
+            background: linear-gradient(135deg, #28a745 0%, #20c997 100%);
+            color: white;
+        }
+        .status-expired {
+            background: linear-gradient(135deg, #dc3545 0%, #c82333 100%);
+            color: white;
+        }
+        .empty-reservations {
+            text-align: center;
+            padding: 4rem 2rem;
+            color: #6c757d;
+        }
+        .pickup-info {
+            background: linear-gradient(135deg, #e3f2fd 0%, #bbdefb 100%);
+            border-radius: 8px;
+            padding: 1rem;
+            margin-top: 1rem;
+        }
+    </style>
+</head>
+<body>
+    <div class="hero-section">
+        <div class="container text-center">
+            <h1>📋 ZeroWaste Exchange - My Reservations</h1>
+            <p class="lead">Track your food rescue orders</p>
+        </div>
+    </div>
+
+    <div class="container mt-4">
+        <div class="row">
+            <div class="col-md-8">
+                <div class="card">
+                    <div class="card-header">
+                        <h5>📋 Your Reservations</h5>
+                    </div>
+                    <div class="card-body" id="reservations-list">
+                        <!-- Reservations will be populated here -->
+                    </div>
+                </div>
+            </div>
+            
+            <div class="col-md-4">
+                <div class="card">
+                    <div class="card-header">
+                        <h5>📊 Reservation Stats</h5>
+                    </div>
+                    <div class="card-body">
+                        <div id="reservation-stats">
+                            <!-- Stats will be populated here -->
+                        </div>
+                        <div class="text-center mt-3">
+                            <a href="simple_dashboard.html" class="btn btn-outline-primary">
+                                ← Back to Dashboard
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Sample reservations data
+        let reservations = [
+            {
+                id: 1,
+                item: "Frozen Pizza",
+                quantity: 2,
+                confirmationCode: "123456",
+                timestamp: "2025-10-04 20:30:00",
+                status: "reserved",
+                pickupWindow: "2025-10-04 22:30:00 - 2025-10-05 02:30:00",
+                image: "🍕",
+                category: "Frozen",
+                discount: 60,
+                urgent: true
+            },
+            {
+                id: 2,
+                item: "Tomatoes",
+                quantity: 1,
+                confirmationCode: "789012",
+                timestamp: "2025-10-04 21:15:00",
+                status: "reserved",
+                pickupWindow: "2025-10-04 23:15:00 - 2025-10-05 03:15:00",
+                image: "🍅",
+                category: "Produce",
+                discount: 60,
+                urgent: true
+            },
+            {
+                id: 3,
+                item: "Cottage Cheese",
+                quantity: 1,
+                confirmationCode: "345678",
+                timestamp: "2025-10-04 19:45:00",
+                status: "completed",
+                pickupWindow: "2025-10-04 21:45:00 - 2025-10-05 01:45:00",
+                image: "🧀",
+                category: "Dairy",
+                discount: 40,
+                urgent: false
+            },
+            {
+                id: 4,
+                item: "Peanut Butter",
+                quantity: 2,
+                confirmationCode: "901234",
+                timestamp: "2025-10-04 18:20:00",
+                status: "expired",
+                pickupWindow: "2025-10-04 20:20:00 - 2025-10-05 00:20:00",
+                image: "🥜",
+                category: "Packaged",
+                discount: 40,
+                urgent: false
+            }
+        ];
+
+        function displayReservations() {
+            const reservationsContainer = document.getElementById('reservations-list');
+            
+            if (reservations.length === 0) {
+                reservationsContainer.innerHTML = `
+                    <div class="empty-reservations">
+                        <h4>📋 No reservations yet</h4>
+                        <p>Start reserving items to help reduce food waste!</p>
+                        <a href="simple_dashboard.html" class="btn btn-primary">Browse Deals</a>
+                    </div>
+                `;
+                return;
+            }
+
+            let html = '';
+            reservations.forEach(reservation => {
+                const statusClass = getStatusClass(reservation.status);
+                const cardClass = reservation.urgent ? 'urgent' : (reservation.status === 'completed' ? 'completed' : '');
+                
+                html += `
+                    <div class="reservation-card ${cardClass}">
+                        <div class="row align-items-center">
+                            <div class="col-md-2">
+                                <div class="text-center">
+                                    <div style="font-size: 3rem;">${reservation.image}</div>
+                                    <small class="text-muted">${reservation.category}</small>
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <h6>${reservation.item}</h6>
+                                <small class="text-muted">Quantity: ${reservation.quantity}</small>
+                                <br>
+                                <small class="text-muted">Reserved: ${reservation.timestamp}</small>
+                                <br>
+                                <span class="badge bg-danger">${reservation.discount}% OFF</span>
+                            </div>
+                            <div class="col-md-3">
+                                <div class="text-center">
+                                    <div class="confirmation-code">${reservation.confirmationCode}</div>
+                                    <small class="text-muted">Confirmation Code</small>
+                                </div>
+                            </div>
+                            <div class="col-md-3">
+                                <div class="text-end">
+                                    <span class="status-badge status-${reservation.status}">
+                                        ${getStatusText(reservation.status)}
+                                    </span>
+                                    <br>
+                                    <small class="text-muted">${reservation.pickupWindow}</small>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        ${reservation.status === 'reserved' ? `
+                            <div class="pickup-info">
+                                <h6>📍 Pickup Instructions:</h6>
+                                <p class="mb-1">1. Go to the store location</p>
+                                <p class="mb-1">2. Show your confirmation code: <strong>${reservation.confirmationCode}</strong></p>
+                                <p class="mb-1">3. Staff will confirm your pickup</p>
+                                <p class="mb-0">4. Enjoy your rescued food!</p>
+                            </div>
+                        ` : ''}
+                        
+                        ${reservation.status === 'completed' ? `
+                            <div class="alert alert-success mt-2">
+                                <strong>✅ Picked up successfully!</strong> Thank you for helping reduce food waste.
+                            </div>
+                        ` : ''}
+                        
+                        ${reservation.status === 'expired' ? `
+                            <div class="alert alert-danger mt-2">
+                                <strong>⏰ Pickup window expired.</strong> This item has been relisted for other customers.
+                            </div>
+                        ` : ''}
+                    </div>
+                `;
+            });
+            
+            reservationsContainer.innerHTML = html;
+            updateReservationStats();
+        }
+
+        function getStatusClass(status) {
+            switch(status) {
+                case 'reserved': return 'status-reserved';
+                case 'completed': return 'status-completed';
+                case 'expired': return 'status-expired';
+                default: return '';
+            }
+        }
+
+        function getStatusText(status) {
+            switch(status) {
+                case 'reserved': return 'Reserved';
+                case 'completed': return 'Completed';
+                case 'expired': return 'Expired';
+                default: return status;
+            }
+        }
+
+        function updateReservationStats() {
+            const total = reservations.length;
+            const active = reservations.filter(r => r.status === 'reserved').length;
+            const completed = reservations.filter(r => r.status === 'completed').length;
+            const expired = reservations.filter(r => r.status === 'expired').length;
+            
+            const totalItems = reservations.reduce((sum, r) => sum + r.quantity, 0);
+            const totalSavings = reservations.reduce((sum, r) => {
+                return sum + (r.quantity * 5 * r.discount / 100); // Estimated savings
+            }, 0);
+
+            document.getElementById('reservation-stats').innerHTML = `
+                <div class="row text-center">
+                    <div class="col-6 mb-3">
+                        <div class="h4 text-primary">${total}</div>
+                        <small>Total Orders</small>
+                    </div>
+                    <div class="col-6 mb-3">
+                        <div class="h4 text-warning">${active}</div>
+                        <small>Active</small>
+                    </div>
+                    <div class="col-6 mb-3">
+                        <div class="h4 text-success">${completed}</div>
+                        <small>Completed</small>
+                    </div>
+                    <div class="col-6 mb-3">
+                        <div class="h4 text-danger">${expired}</div>
+                        <small>Expired</small>
+                    </div>
+                </div>
+                <hr>
+                <div class="text-center">
+                    <div class="h5 text-success">${totalItems}</div>
+                    <small>Items Rescued</small>
+                    <br>
+                    <div class="h6 text-info">$${totalSavings.toFixed(2)}</div>
+                    <small>Money Saved</small>
+                    <br>
+                    <div class="mt-2">
+                        <small class="text-muted">
+                            🌱 You've helped save ${totalItems} items from waste!
+                        </small>
+                    </div>
+                </div>
+            `;
+        }
+
+        // Initialize reservations display
+        document.addEventListener('DOMContentLoaded', function() {
+            displayReservations();
+        });
+    </script>
+</body>
+</html>
